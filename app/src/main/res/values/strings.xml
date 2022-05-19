@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">VivinoCamera</string>
+    <string name="title_activity_vivino_camera">VivinoCameraActivity</string>
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
+    <string name="pref_key_info_hide" translatable="false">ih</string>
+    <string name="pref_key_camera_live_viewport" translatable="false">clv</string>
+    <string name="pref_key_live_preview_object_detector_enable_multiple_objects" translatable="false">lpodemo</string>
+    <string name="pref_key_still_image_object_detector_enable_multiple_objects" translatable="false">siodemo</string>
+    <string name="pref_key_live_preview_object_detector_enable_classification" translatable="false">lpodec</string>
+    <string name="pref_key_still_image_object_detector_enable_classification" translatable="false">siodec</string>
+
+</resources>
