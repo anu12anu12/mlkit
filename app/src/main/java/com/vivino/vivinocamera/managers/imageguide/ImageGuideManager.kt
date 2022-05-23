@@ -10,7 +10,11 @@ import com.vivino.vivinocamera.utils.Common
 import kotlin.math.pow
 
 
-class ImageGuideManager(val context: Context, val previewView: PreviewView) : BestBottlePositionInterface {
+class ImageGuideManager(
+    private val results: List<DetectedObject>,
+    val context: Context,
+    private val previewView: PreviewView
+) : BestBottlePositionInterface {
     val screenHeight = Common.dpFromPx(context, previewView.height.toFloat())
     val screenWidth = Common.dpFromPx(context, previewView.width.toFloat())
 
@@ -18,9 +22,8 @@ class ImageGuideManager(val context: Context, val previewView: PreviewView) : Be
         return (rect.left - left).toDouble().pow(2) + (rect.top - top).toDouble().pow(2)
     }
 
-    override fun getDetectionPositionStatus(
-        detectedObjects: List<DetectedObject>): IdealPositionStatus {
-        for (detectedObject in detectedObjects) {
+    override fun getDetectionPositionStatus(): IdealPositionStatus {
+        for (detectedObject in results) {
             val bottleWidth =
                 (detectedObject.boundingBox.right - detectedObject.boundingBox.left).toFloat()
             val bottleHeight =
@@ -46,15 +49,5 @@ class ImageGuideManager(val context: Context, val previewView: PreviewView) : Be
 //            if (bottleCentreY > (correctY))  return IdealPositionStatus.POSITION_BOTTOM
         }
         return IdealPositionStatus.IDEAL
-    }
-
-
-    override fun getBottleDetectionCloserToCenter(
-        detectedObjects: List<DetectedObject>): Rect {
-        val rect = Rect()
-        if (detectedObjects.isNotEmpty()) {
-            val detectedObject = detectedObjects[0]
-        }
-        return rect
     }
 }

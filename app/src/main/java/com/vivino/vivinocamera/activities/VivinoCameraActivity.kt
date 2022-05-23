@@ -1,5 +1,7 @@
 package com.vivino.vivinocamera.activities
 
+import android.graphics.Bitmap
+import android.graphics.RectF
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
@@ -18,6 +20,7 @@ import com.google.mlkit.vision.objects.custom.CustomObjectDetectorOptions
 import com.vivino.vivinocamera.databinding.ActivityVivinoCameraBinding
 import com.vivino.vivinocamera.interfaces.DetectedObjectListener
 import com.vivino.vivinocamera.interfaces.VisionImageProcessor
+import com.vivino.vivinocamera.managers.imageeditor.ImageEditorManager
 import com.vivino.vivinocamera.managers.imageguide.ImageGuideManager
 import com.vivino.vivinocamera.managers.objectdetector.ObjectDetectionManager
 import com.vivino.vivinocamera.viewmodels.CameraXViewModel
@@ -239,34 +242,36 @@ class VivinoCameraActivity : AppCompatActivity(), DetectedObjectListener {
         private const val TAG = "VivinoCameraActivity"
     }
 
-    override fun detectedObjects(results: List<DetectedObject>?, mode: Int) {
-        when (mode) {
-            CustomObjectDetectorOptions.SINGLE_IMAGE_MODE -> {
-                results?.let { resultsIt ->
-                    if (resultsIt.isNotEmpty() && resultsIt[0].labels.isNotEmpty()) {
-                        Toast.makeText(
-                            this,
-                            "Object Detected ${resultsIt[0].labels[0].text}",
-                            Toast.LENGTH_LONG
-                        ).show()
-                    } else {
-                        Toast.makeText(this, "Object Detection Failed", Toast.LENGTH_LONG).show()
-                    }
+    override fun detectedObjects(
+        mode: Int,
+        results: List<DetectedObject>?,
+        originalBitmap: Bitmap?,
+    ) {
+        handleResult(mode, results, originalBitmap)
+    }
 
-                } ?: run {
-                    Toast.makeText(this, "Object Detection Failed", Toast.LENGTH_LONG).show()
+    private fun handleResult(mode: Int, results: List<DetectedObject>?, originalBitmap: Bitmap?) {
+        results?.apply {
+            when (mode) {
+                CustomObjectDetectorOptions.SINGLE_IMAGE_MODE -> {
+                    if (isNotEmpty()) {
+                        val imageEditorManager = ImageEditorManager()
+                        originalBitmap?.let {
+                            val bottleBitmap = imageEditorManager.cropBitmapByRect(it, RectF(this[0].boundingBox))
+                            val labelBitMap = imageEditorManager.cutBottleAndGetBitMap(bottleBitmap, 20)
+                        }
+                    }
                 }
-                bindAllCameraUseCases()
-            }
-            CustomObjectDetectorOptions.STREAM_MODE -> {
-                results?.takeIf { it.isNotEmpty() }?.apply {
-                    val imageGuideManager = ImageGuideManager(this@VivinoCameraActivity, binding.previewView)
-                    val idealStatus = imageGuideManager.getDetectionPositionStatus(this)
+                CustomObjectDetectorOptions.STREAM_MODE -> {
+                    val imageGuideManager =
+                        ImageGuideManager(this, this@VivinoCameraActivity, binding.previewView)
+                    val idealStatus = imageGuideManager.getDetectionPositionStatus()
                     binding.bottomControlsID.guideText.visibility = View.VISIBLE
                     binding.bottomControlsID.guideText.text = idealStatus.imageGuideText
                 }
             }
         }
+
     }
 
 }

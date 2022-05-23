@@ -7,7 +7,8 @@ import com.google.mlkit.vision.objects.DetectedObject
 
 interface DetectedObjectListener {
     fun detectedObjects(
+        @NonNull mode: Int,
         @Nullable results: List<DetectedObject>?,
-        @NonNull mode: Int
+        @Nullable originalBitmap: Bitmap?
     )
 }

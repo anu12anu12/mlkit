@@ -96,7 +96,7 @@ public class ObjectDetectionManager extends VisionProcessorBase<List<DetectedObj
 
   private void notifyObservers(@Nullable final List<DetectedObject> results) {
     if (detectObjectListener != null) {
-      detectObjectListener.detectedObjects(results, processingMode);
+      detectObjectListener.detectedObjects(processingMode, results, originalBitmapImage);
     }
   }
 
